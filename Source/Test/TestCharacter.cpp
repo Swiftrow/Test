@@ -8,6 +8,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Math/UnrealMathVectorCommon.h"
+#include "Kismet/KismetMathLibrary.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 // ATestCharacter
@@ -17,6 +20,14 @@ ATestCharacter::ATestCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
+	//Setting The wall running trigger capsule
+	TriggerCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger Capsule"));
+	TriggerCapsule->InitCapsuleSize(55.0f, 96.0f);
+	TriggerCapsule->SetCollisionProfileName(TEXT("Trigger"));
+	TriggerCapsule->SetupAttachment(RootComponent);
+
+	TriggerCapsule->OnComponentBeginOverlap.AddDynamic(this, &ATestCharacter::OnOverlapBegin);
+	TriggerCapsule->OnComponentEndOverlap.AddDynamic(this, &ATestCharacter::OnOverlapEnd);
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
@@ -29,19 +40,25 @@ ATestCharacter::ATestCharacter()
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->JumpZVelocity = 600.f;
+	GetCharacterMovement()->JumpZVelocity = 300.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+	//Create a First Person Camera
+	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCamera->SetupAttachment(RootComponent);
+	
+
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -74,6 +91,9 @@ void ATestCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ATestCharacter::OnResetVR);
+
+	//Changing between ThirdPerson and FirstPerson
+	PlayerInputComponent->BindAction("ChangeCamera",IE_Pressed, this, &ATestCharacter::ChangeCamera);
 }
 
 
@@ -121,6 +141,12 @@ void ATestCharacter::MoveForward(float Value)
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
+
+		if (bIsWallRunning)
+		{
+			SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, WallRunZAxis), true);
+
+		}
 	}
 }
 
@@ -136,5 +162,66 @@ void ATestCharacter::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
+
+		if (bIsWallRunning)
+		{
+					
+			SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, WallRunZAxis), true);
+
+		}
+		//Initial Wall running 
+		//SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, 300.0f),true);
 	}
+}
+void ATestCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+
+	//need this check to see if it overlaps with itself
+	if (OtherActor && (OtherActor != this) && OtherComp) {
+		//gets the Z axis location when overlapping with the wall	
+		WallRunZAxis = GetActorLocation().Z;
+		//adds another jump to the character 
+		JumpMaxCount += 1;
+		GetCharacterMovement()->JumpZVelocity = 700.0f;
+		JumpMaxHoldTime += 2;
+
+		bIsWallRunning = true;
+
+
+		//used for debugging
+		if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("IsWallRunning"), bIsWallRunning));
+
+		}
+	}
+}
+
+void ATestCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor && (OtherActor != this) && OtherComp) {
+		bIsWallRunning = false;
+		//removes the added jump from the character
+		JumpMaxHoldTime -= 2;
+		JumpMaxCount -= 1;
+		GetCharacterMovement()->JumpZVelocity = 300.0f;
+	}
+
+}
+
+//changing between first and third person camera 
+void ATestCharacter::ChangeCamera() {
+	//switches between FollowCamera and FirstPersonCamera
+	if (FollowCamera->IsActive()) {
+		FollowCamera->Deactivate();
+		FirstPersonCamera->Activate();
+	}
+	else
+	{
+		FollowCamera->Activate();
+		FirstPersonCamera->Deactivate();
+	}
+	
+	
+	
 }

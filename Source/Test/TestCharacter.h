@@ -18,6 +18,15 @@ class ATestCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	/** First Person Camera**/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		class UCameraComponent* FirstPersonCamera;
+
+	/**Trigger Capsule for Wall Running **/
+	UPROPERTY(VisibleAnywhere, Category = "Trigger Capsule")
+		class UCapsuleComponent* TriggerCapsule;
+
 public:
 	ATestCharacter();
 
@@ -28,6 +37,30 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
+	UPROPERTY(EditAnywhere)
+	bool bIsWallRunning;
+
+	UPROPERTY(VisibleAnywhere)
+	float WallRunZAxis;
+
+	UPROPERTY(VisibleAnywhere)
+	float WallRunYAxis;
+
+	UPROPERTY(VisibleAnywhere)
+	float WallRunXAxis;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bCameraSwitch;
+
+	// declare overlap begin function
+	UFUNCTION()
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	// declare overlap end function
+	UFUNCTION()
+	 void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 
 protected:
 
@@ -57,6 +90,8 @@ protected:
 
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+
+	void ChangeCamera();
 
 protected:
 	// APawn interface
