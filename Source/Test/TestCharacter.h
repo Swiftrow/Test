@@ -53,6 +53,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bCameraSwitch;
 
+
 	// declare overlap begin function
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -79,6 +80,7 @@ protected:
 	 */
 	void TurnAtRate(float Rate);
 
+	FString OverlapingObjectName;
 	/**
 	 * Called via input to turn look up/down at a given rate. 
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
@@ -92,6 +94,8 @@ protected:
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
 	void ChangeCamera();
+
+	void WallRun();
 
 protected:
 	// APawn interface

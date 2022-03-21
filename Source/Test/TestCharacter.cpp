@@ -64,6 +64,8 @@ ATestCharacter::ATestCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
+
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -142,11 +144,7 @@ void ATestCharacter::MoveForward(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
 
-		if (bIsWallRunning)
-		{
-			SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, WallRunZAxis), true);
-
-		}
+		WallRun();
 	}
 }
 
@@ -163,12 +161,7 @@ void ATestCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 
-		if (bIsWallRunning)
-		{
-					
-			SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, WallRunZAxis), true);
-
-		}
+		WallRun();
 		//Initial Wall running 
 		//SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, 300.0f),true);
 	}
@@ -176,35 +169,34 @@ void ATestCharacter::MoveRight(float Value)
 void ATestCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
-
+	OverlapingObjectName = OtherActor->GetName();
 	//need this check to see if it overlaps with itself
 	if (OtherActor && (OtherActor != this) && OtherComp) {
 		//gets the Z axis location when overlapping with the wall	
 		WallRunZAxis = GetActorLocation().Z;
+
 		//adds another jump to the character 
-		JumpMaxCount += 1;
 		GetCharacterMovement()->JumpZVelocity = 700.0f;
-		JumpMaxHoldTime += 2;
-
 		bIsWallRunning = true;
-
-
+		JumpMaxCount += 1;
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *OverlapingObjectName);
 		//used for debugging
 		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("IsWallRunning"), bIsWallRunning));
-
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("AA "), *OverlapingObjectName));
 		}
 	}
 }
 
 void ATestCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherActor && (OtherActor != this) && OtherComp) {
+{		
+	
+	if (OtherActor && (OtherActor != this) && OtherComp ) {
 		bIsWallRunning = false;
-		//removes the added jump from the character
-		JumpMaxHoldTime -= 2;
+		//removes the added jump from the character and sets the velocity back to default
 		JumpMaxCount -= 1;
 		GetCharacterMovement()->JumpZVelocity = 300.0f;
+		//GetCharacterMovement()->ConstrainLocationToPlane(FVector(1.0f,0.0f,0.0f));
+	
 	}
 
 }
@@ -221,7 +213,13 @@ void ATestCharacter::ChangeCamera() {
 		FollowCamera->Activate();
 		FirstPersonCamera->Deactivate();
 	}
+}
+
+void ATestCharacter::WallRun() 
+{
 	
-	
-	
+	if (bIsWallRunning)
+	{
+		SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, WallRunZAxis), true);		
+	}
 }
