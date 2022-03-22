@@ -40,7 +40,7 @@ ATestCharacter::ATestCharacter()
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->JumpZVelocity = 300.f;
+	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
@@ -191,7 +191,6 @@ void ATestCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 	if (OtherActor && (OtherActor != this) && OtherComp ) {
 
 		bIsWallRunning = false;
-		bIsOnLedge = false;
 		
 		
 		if ((OverlapingObjectName.Contains("RunnableWall"))) {
@@ -245,7 +244,7 @@ void ATestCharacter::WallJumpBegin()
 void ATestCharacter::WallJumpEnd()
 {
 	JumpMaxCount -= 1;
-	GetCharacterMovement()->JumpZVelocity = 300.0f;
+	GetCharacterMovement()->JumpZVelocity = 600.0f;
 }
 
 //checks what type of objects is interacting with
@@ -274,6 +273,6 @@ void ATestCharacter::GrabLedge()
 
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->GravityScale = 0;
-	bIsOnLedge = true;
+
 		
 }
