@@ -172,13 +172,14 @@ void ATestCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 	OverlapingObjectName = OtherActor->GetName();
 	//need this check to see if it overlaps with itself
 	if (OtherActor && (OtherActor != this) && OtherComp) {
+		
 		//gets the Z axis location when overlapping with the wall	
 		WallRunZAxis = GetActorLocation().Z;
-
-		//adds another jump to the character 
-		GetCharacterMovement()->JumpZVelocity = 700.0f;
+	
 		bIsWallRunning = true;
-		JumpMaxCount += 1;
+
+		WallJumpBegin();
+
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *OverlapingObjectName);
 		//used for debugging
 		if (GEngine) {
@@ -191,17 +192,17 @@ void ATestCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 {		
 	
 	if (OtherActor && (OtherActor != this) && OtherComp ) {
+
 		bIsWallRunning = false;
-		//removes the added jump from the character and sets the velocity back to default
-		JumpMaxCount -= 1;
-		GetCharacterMovement()->JumpZVelocity = 300.0f;
-		//GetCharacterMovement()->ConstrainLocationToPlane(FVector(1.0f,0.0f,0.0f));
-	
+
+		WallJumpEnd();	
+		
+		//GetCharacterMovement()->ConstrainLocationToPlane(FVector(1.0f,0.0f,0.0f));	
 	}
 
 }
 
-//changing between first and third person camera 
+//changes between first and third person camera 
 void ATestCharacter::ChangeCamera() {
 	//switches between FollowCamera and FirstPersonCamera
 	if (FollowCamera->IsActive()) {
@@ -215,11 +216,28 @@ void ATestCharacter::ChangeCamera() {
 	}
 }
 
+//locks the Z axis by saving the first Z-value when hitting the box collisiion
 void ATestCharacter::WallRun() 
 {
 	
 	if (bIsWallRunning)
 	{
-		SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, WallRunZAxis), true);		
+	SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, WallRunZAxis), true);		
 	}
+}
+
+//adds another jump to the character so that it can jump off walls
+void ATestCharacter::WallJumpBegin()
+{
+	//adds more velocity to the jump 
+	GetCharacterMovement()->JumpZVelocity = 700.0f;
+	//adds another jump to the character 
+	JumpMaxCount += 1;
+}
+
+//removes the extra jump and sets the velocity back to default
+void ATestCharacter::WallJumpEnd()
+{
+	JumpMaxCount -= 1;
+	GetCharacterMovement()->JumpZVelocity = 300.0f;
 }

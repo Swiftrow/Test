@@ -20,6 +20,7 @@ public:
 	UPROPERTY(EditAnywhere);
 	class UStaticMeshComponent* WallMesh;
 
+
 	//collision box for triggering the wall run
 	UPROPERTY(VisibleAnywhere, Category = Collision)
 		class UBoxComponent* RunnableTrigger;

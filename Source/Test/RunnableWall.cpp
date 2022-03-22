@@ -15,6 +15,7 @@ ARunnableWall::ARunnableWall()
 	RunnableTrigger->SetupAttachment(RootComponent);
 	WallMesh = CreateDefaultSubobject<UStaticMeshComponent>("WallMesh");
 	
+	
 	//RunnableTrigger->InitBoxExtent(FVector(200.0f, 100.0f, 100.0f));
 
 }

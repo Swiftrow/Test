@@ -97,6 +97,9 @@ protected:
 
 	void WallRun();
 
+	void WallJumpBegin();
+
+	void WallJumpEnd();
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
