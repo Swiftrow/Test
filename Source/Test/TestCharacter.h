@@ -100,6 +100,9 @@ protected:
 	void WallJumpBegin();
 
 	void WallJumpEnd();
+
+	void CheckForInteractable();
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

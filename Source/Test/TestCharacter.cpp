@@ -143,7 +143,7 @@ void ATestCharacter::MoveForward(float Value)
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
-
+		
 		WallRun();
 	}
 }
@@ -161,40 +161,36 @@ void ATestCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 
+		
 		WallRun();
 		//Initial Wall running 
 		//SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, 300.0f),true);
 	}
 }
+
+//handles when character overlaps with collision boxes
 void ATestCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
-	OverlapingObjectName = OtherActor->GetName();
+
 	//need this check to see if it overlaps with itself
 	if (OtherActor && (OtherActor != this) && OtherComp) {
-		
-		//gets the Z axis location when overlapping with the wall	
-		WallRunZAxis = GetActorLocation().Z;
+		OverlapingObjectName = OtherActor->GetActorLabel();
+		//checks objects that is overlapping
+		CheckForInteractable();
+
+		//OverlapingObjectName = OtherActor->GetName();
 	
-		bIsWallRunning = true;
-
-		WallJumpBegin();
-
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *OverlapingObjectName);
-		//used for debugging
-		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("AA "), *OverlapingObjectName));
-		}
 	}
 }
 
+//handles the end of overlap with collision boxes
 void ATestCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {		
 	
 	if (OtherActor && (OtherActor != this) && OtherComp ) {
 
 		bIsWallRunning = false;
-
 		WallJumpEnd();	
 		
 		//GetCharacterMovement()->ConstrainLocationToPlane(FVector(1.0f,0.0f,0.0f));	
@@ -222,6 +218,7 @@ void ATestCharacter::WallRun()
 	
 	if (bIsWallRunning)
 	{
+		//gets the Z axis location when overlapping with the wall	
 	SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, WallRunZAxis), true);		
 	}
 }
@@ -229,10 +226,12 @@ void ATestCharacter::WallRun()
 //adds another jump to the character so that it can jump off walls
 void ATestCharacter::WallJumpBegin()
 {
+	
 	//adds more velocity to the jump 
-	GetCharacterMovement()->JumpZVelocity = 700.0f;
+	GetCharacterMovement()->JumpZVelocity = 900.0f;
 	//adds another jump to the character 
 	JumpMaxCount += 1;
+
 }
 
 //removes the extra jump and sets the velocity back to default
@@ -240,4 +239,25 @@ void ATestCharacter::WallJumpEnd()
 {
 	JumpMaxCount -= 1;
 	GetCharacterMovement()->JumpZVelocity = 300.0f;
+}
+
+//checks what type of objects is interacting with
+void ATestCharacter::CheckForInteractable()
+{
+	
+	if (OverlapingObjectName.Contains("GrabbableLedge"))
+	{
+
+		//used for debugging
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *OverlapingObjectName);
+	}
+	if ((OverlapingObjectName.Contains("RunnableWall")))
+	{
+		WallRunZAxis = GetActorLocation().Z;
+		//enable wall running if colliding with a runnable wall
+		bIsWallRunning = true;
+		WallJumpBegin();
+		//used for debugging 
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *OverlapingObjectName);
+	}
 }

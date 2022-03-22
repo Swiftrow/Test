@@ -7,6 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "RunnableWall.generated.h"
 
+
 UCLASS()
 class TEST_API ARunnableWall : public AActor
 {
@@ -20,14 +21,16 @@ public:
 	UPROPERTY(EditAnywhere);
 	class UStaticMeshComponent* WallMesh;
 
-
 	//collision box for triggering the wall run
 	UPROPERTY(VisibleAnywhere, Category = Collision)
 		class UBoxComponent* RunnableTrigger;
+	
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+
 
 public:	
 	// Called every frame

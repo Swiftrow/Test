@@ -2,6 +2,12 @@
 
 
 #include "RunnableWall.h"
+#include "GameplayTags/Classes/GameplayTagsManager.h"
+#include "GameplayTags/Classes/GameplayTagContainer.h"
+#include "GameplayTagsModule.h"
+#include "GameplayTagsSettings.h"
+#include "GameplayTags.h"
+#include "GameplayTagsManager.h"
 
 // Sets default values
 ARunnableWall::ARunnableWall()
@@ -14,7 +20,6 @@ ARunnableWall::ARunnableWall()
 	RunnableTrigger = CreateDefaultSubobject<UBoxComponent>("RunnableTrigger");
 	RunnableTrigger->SetupAttachment(RootComponent);
 	WallMesh = CreateDefaultSubobject<UStaticMeshComponent>("WallMesh");
-	
 	
 	//RunnableTrigger->InitBoxExtent(FVector(200.0f, 100.0f, 100.0f));
 
@@ -33,4 +38,3 @@ void ARunnableWall::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
