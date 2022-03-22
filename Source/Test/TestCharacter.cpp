@@ -134,7 +134,7 @@ void ATestCharacter::LookUpAtRate(float Rate)
 
 void ATestCharacter::MoveForward(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if ((Controller != nullptr) && (Value != 0.0f) )
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -150,7 +150,7 @@ void ATestCharacter::MoveForward(float Value)
 
 void ATestCharacter::MoveRight(float Value)
 {
-	if ( (Controller != nullptr) && (Value != 0.0f) )
+	if ( (Controller != nullptr) && (Value != 0.0f)  )
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -191,8 +191,15 @@ void ATestCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 	if (OtherActor && (OtherActor != this) && OtherComp ) {
 
 		bIsWallRunning = false;
-		WallJumpEnd();	
+		bIsOnLedge = false;
 		
+		
+		if ((OverlapingObjectName.Contains("RunnableWall"))) {
+			WallJumpEnd();
+		}
+		
+		//SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z));
+		GetCharacterMovement()->GravityScale = 1;
 		//GetCharacterMovement()->ConstrainLocationToPlane(FVector(1.0f,0.0f,0.0f));	
 	}
 
@@ -247,7 +254,7 @@ void ATestCharacter::CheckForInteractable()
 	
 	if (OverlapingObjectName.Contains("GrabbableLedge"))
 	{
-
+		GrabLedge();
 		//used for debugging
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *OverlapingObjectName);
 	}
@@ -260,4 +267,13 @@ void ATestCharacter::CheckForInteractable()
 		//used for debugging 
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *OverlapingObjectName);
 	}
+}
+
+void ATestCharacter::GrabLedge()
+{
+
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->GravityScale = 0;
+	bIsOnLedge = true;
+		
 }

@@ -22,7 +22,7 @@ public:
 
 	//collision box for triggering the wall run
 	UPROPERTY(VisibleAnywhere, Category = Collision)
-		class UBoxComponent* RunnableTrigger;
+		class UBoxComponent* TriggerBox;
 
 protected:
 	// Called when the game starts or when spawned

@@ -10,9 +10,11 @@ AInteractableActor::AInteractableActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//initialize WallMesh and TriggerBox
-	RunnableTrigger = CreateDefaultSubobject<UBoxComponent>("RunnableTrigger");
-	RunnableTrigger->SetupAttachment(RootComponent);
 	WallMesh = CreateDefaultSubobject<UStaticMeshComponent>("WallMesh");
+	//WallMesh->SetupAttachment(RootComponent);
+	TriggerBox = CreateDefaultSubobject<UBoxComponent>("RunnableTrigger");
+	//RunnableTrigger->SetupAttachment(RootComponent);
+	
 
 }
 

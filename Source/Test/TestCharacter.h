@@ -38,8 +38,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	bool bIsWallRunning;
+
+	UPROPERTY(VisibleAnywhere)
+	bool bIsOnLedge;
 
 	UPROPERTY(VisibleAnywhere)
 	float WallRunZAxis;
@@ -53,6 +56,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bCameraSwitch;
 
+	
 
 	// declare overlap begin function
 	UFUNCTION()
@@ -102,6 +106,10 @@ protected:
 	void WallJumpEnd();
 
 	void CheckForInteractable();
+
+	void GrabLedge();
+
+	
 
 protected:
 	// APawn interface
