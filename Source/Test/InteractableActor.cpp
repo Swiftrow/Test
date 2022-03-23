@@ -14,7 +14,7 @@ AInteractableActor::AInteractableActor()
 	WallMesh->SetupAttachment(RootComponent);
 	TriggerBox = CreateDefaultSubobject<UBoxComponent>("RunnableTrigger");
 	TriggerBox->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	TriggerBox->InitBoxExtent(FVector(0.0f,0.0f,0.0f));
+	TriggerBox->InitBoxExtent(FVector(200.0f,50.0f,100.0f));
 	TriggerBox->SetupAttachment(WallMesh);
 	
 

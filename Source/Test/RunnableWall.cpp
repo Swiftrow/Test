@@ -17,8 +17,6 @@ ARunnableWall::ARunnableWall()
 
 	//initialize WallMesh and TriggerBox
 	
-	RunnableTrigger = CreateDefaultSubobject<UBoxComponent>("RunnableTrigger");
-	RunnableTrigger->SetupAttachment(RootComponent);
 	WallMesh = CreateDefaultSubobject<UStaticMeshComponent>("WallMesh");
 	
 	//RunnableTrigger->InitBoxExtent(FVector(200.0f, 100.0f, 100.0f));
