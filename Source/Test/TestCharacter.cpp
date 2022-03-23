@@ -155,13 +155,14 @@ void ATestCharacter::MoveRight(float Value)
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
+		//gets left or right key
+		DirectionOfMovement = Value;
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
-
-		
+	
+		CheckDirection();
 		WallRun();
 		//Initial Wall running 
 		//SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, 300.0f),true);
@@ -171,7 +172,6 @@ void ATestCharacter::MoveRight(float Value)
 //handles when character overlaps with collision boxes
 void ATestCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
 
 	//need this check to see if it overlaps with itself
 	if (OtherActor && (OtherActor != this) && OtherComp) {
@@ -192,11 +192,12 @@ void ATestCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 
 		bIsWallRunning = false;
 		
-		
 		if ((OverlapingObjectName.Contains("RunnableWall"))) {
 			WallJumpEnd();
 		}
 		
+		bIsOnLedge = false;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
 		//SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z));
 		GetCharacterMovement()->GravityScale = 1;
 		//GetCharacterMovement()->ConstrainLocationToPlane(FVector(1.0f,0.0f,0.0f));	
@@ -232,7 +233,7 @@ void ATestCharacter::WallRun()
 //adds another jump to the character so that it can jump off walls
 void ATestCharacter::WallJumpBegin()
 {
-	
+	GetCharacterMovement()->AddImpulse(FVector(0.4f,0.4f,0.0f), true);
 	//adds more velocity to the jump 
 	GetCharacterMovement()->JumpZVelocity = 900.0f;
 	//adds another jump to the character 
@@ -259,6 +260,7 @@ void ATestCharacter::CheckForInteractable()
 	}
 	if ((OverlapingObjectName.Contains("RunnableWall")))
 	{
+		//saves the Z axis (height) when overlapping with a wall
 		WallRunZAxis = GetActorLocation().Z;
 		//enable wall running if colliding with a runnable wall
 		bIsWallRunning = true;
@@ -268,11 +270,28 @@ void ATestCharacter::CheckForInteractable()
 	}
 }
 
+//logic that handles ledge grabbing
 void ATestCharacter::GrabLedge()
 {
-
+	bIsOnLedge = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->GravityScale = 0;
 
 		
+}
+
+//checks for left and right to play the proper wall running animations
+void ATestCharacter::CheckDirection()
+{
+	if (DirectionOfMovement == 1.0f) 
+	{
+	bIsOnRight = true;
+	bIsOnLeft = false;
+	}
+	if (DirectionOfMovement == -1.0f)
+	{
+	bIsOnLeft = true;
+	bIsOnRight = false;
+	}
 }

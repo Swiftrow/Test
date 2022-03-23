@@ -11,10 +11,13 @@ AInteractableActor::AInteractableActor()
 
 	//initialize WallMesh and TriggerBox
 	WallMesh = CreateDefaultSubobject<UStaticMeshComponent>("WallMesh");
-	//WallMesh->SetupAttachment(RootComponent);
+	WallMesh->SetupAttachment(RootComponent);
 	TriggerBox = CreateDefaultSubobject<UBoxComponent>("RunnableTrigger");
-	//RunnableTrigger->SetupAttachment(RootComponent);
+	TriggerBox->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	TriggerBox->InitBoxExtent(FVector(0.0f,0.0f,0.0f));
+	TriggerBox->SetupAttachment(WallMesh);
 	
+
 
 }
 
@@ -23,6 +26,7 @@ void AInteractableActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
 }
 
 // Called every frame
