@@ -159,9 +159,9 @@ void ATestCharacter::MoveRight(float Value)
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
+		DirectionOfMovement = Value;
 		AddMovementInput(Direction, Value);
-
-		
+		CheckDirection();
 		WallRun();
 		//Initial Wall running 
 		//SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, 300.0f),true);
@@ -190,11 +190,15 @@ void ATestCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 	
 	if (OtherActor && (OtherActor != this) && OtherComp ) {
 
-		bIsWallRunning = false;
 		
+	
 		
 		if ((OverlapingObjectName.Contains("RunnableWall"))) {
 			WallJumpEnd();
+			bIsWallRunning = false;
+		}
+		if ((OverlapingObjectName.Contains("GrabbableLedge"))) {
+			bIsOnLedge = false;
 		}
 		
 		//SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z));
@@ -253,15 +257,16 @@ void ATestCharacter::CheckForInteractable()
 	
 	if (OverlapingObjectName.Contains("GrabbableLedge"))
 	{
+		bIsOnLedge = true;
 		GrabLedge();
 		//used for debugging
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *OverlapingObjectName);
 	}
 	if ((OverlapingObjectName.Contains("RunnableWall")))
 	{
+		bIsWallRunning = true;
 		WallRunZAxis = GetActorLocation().Z;
 		//enable wall running if colliding with a runnable wall
-		bIsWallRunning = true;
 		WallJumpBegin();
 		//used for debugging 
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *OverlapingObjectName);
@@ -270,9 +275,20 @@ void ATestCharacter::CheckForInteractable()
 
 void ATestCharacter::GrabLedge()
 {
-
+	
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->GravityScale = 0;
+}
 
-		
+void ATestCharacter::CheckDirection()
+{
+if (DirectionOfMovement == 1.0f)
+{
+	bIsOnRight = true;
+}else bIsOnRight=false;
+
+if (DirectionOfMovement == -1.0f)
+{
+	bIsOnLeft = true;
+}else bIsOnLeft =false;
 }
