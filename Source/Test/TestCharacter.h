@@ -38,17 +38,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere)
 	bool bIsWallRunning;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere)
 	bool bIsOnLedge;
-
-	UPROPERTY(BlueprintReadOnly)
-		bool bIsOnRight;
-
-	UPROPERTY(BlueprintReadOnly)
-		bool bIsOnLeft;
 
 	UPROPERTY(VisibleAnywhere)
 	float WallRunZAxis;
@@ -115,9 +109,7 @@ protected:
 
 	void GrabLedge();
 
-	void CheckDirection();
-
-	float DirectionOfMovement;
+	
 
 protected:
 	// APawn interface
